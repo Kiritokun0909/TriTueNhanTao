@@ -15,22 +15,47 @@ import seaborn as sns
 # Load data into a Pandas dataframe
 data = pd.read_csv('Hotel Reservations.csv')
 
+d = {}
+for u in list(data.columns):
+  if(u == 'Booking_ID'):
+      continue
+  
+  print(u, end= ': ')
+  d = []
+  for v in data[u]:
+    d.append(v)
+  print(set(d))
+
 # Số lượng cột (features) trong data
 print(len(data.columns))
-print(list(data.columns))
 
 # Convert data which is string type to numeric type
-data.replace({
-    "type_of_meal_plan" : {'Not Selected': 0, 'Meal Plan 2': 1, 'Meal Plan 1': 2, 'Meal Plan 3': 3},
-    "room_type_reserved" : {'Room_Type 1': 0, 'Room_Type 2': 1, 'Room_Type 3': 2, 'Room_Type 4': 3, 'Room_Type 5': 4, 'Room_Type 6': 5, 'Room_Type 7': 6},
-    "market_segment_type" : {'Online': 0, 'Corporate': 1, 'Complementary': 2, 'Aviation': 3, 'Offline': 4},
-    "booking_status" : {"Not_Canceled": 0, "Canceled": 1}
-    },
-    inplace = True)
-data.head()
+d = {}
+for u in list(data.columns):
+  if(u == 'Booking_ID' or u == 'arrival_year' or u == 'avg_price_per_room'):
+      continue
+    
+  l = []
+  for v in data[u]:
+    l.append(v)
 
-# Thống kê booking_status
-data['booking_status'].value_counts()
+  d[u] = set(l)
+
+  i = 0
+  for v in d[u]:
+    data.replace({u : {v: i}}, inplace = True)
+    i = i + 1
+
+# Kiem tra lai cac gia tri sau khi covert
+for u in list(data.columns):
+  if(u == 'Booking_ID'):
+      continue
+  
+  print(u, end= ': ')
+  d = []
+  for v in data[u]:
+    d.append(v)
+  print(set(d))
 
 # Tạo dữ liệu train model
 X = data.drop(columns=['booking_status', 'Booking_ID'])
@@ -95,12 +120,21 @@ customers = pd.read_csv('Predicts.csv')
 booking_id = list(customers['Booking_ID'])
 
 test = customers.drop(columns=['booking_status', 'Booking_ID'])
-test.replace({
-    "type_of_meal_plan" : {'Not Selected': 0, 'Meal Plan 2': 1, 'Meal Plan 1': 2, 'Meal Plan 3': 3},
-    "room_type_reserved" : {'Room_Type 1': 0, 'Room_Type 2': 1, 'Room_Type 3': 2, 'Room_Type 4': 3, 'Room_Type 5': 4, 'Room_Type 6': 5, 'Room_Type 7': 6},
-    "market_segment_type" : {'Online': 0, 'Corporate': 1, 'Complementary': 2, 'Aviation': 3, 'Offline': 4}
-    },
-    inplace = True)
+d = {}
+for u in list(test.columns):
+  if(u == 'arrival_year' or u == 'avg_price_per_room'):
+      continue
+    
+  l = []
+  for v in test[u]:
+    l.append(v)
+
+  d[u] = set(l)
+
+  i = 0
+  for v in d[u]:
+    test.replace({u : {v: i}}, inplace = True)
+    i = i + 1
 
 test = rf.predict(test)
 
